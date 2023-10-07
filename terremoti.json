@@ -1,0 +1,1351 @@
+[
+    {
+        "id": "d77ae86c60c0d054",
+        "type": "tab",
+        "label": "Progetto Terremoti",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "7304a8ab1f8b611b",
+        "type": "http request",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.csv",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 310,
+        "y": 160,
+        "wires": [
+            [
+                "3e331f871faff0d7"
+            ]
+        ]
+    },
+    {
+        "id": "3e331f871faff0d7",
+        "type": "csv",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 470,
+        "y": 160,
+        "wires": [
+            [
+                "3b661be732a9272d",
+                "f4d292a6c17f13d0",
+                "3dcb1318c4da94e3"
+            ]
+        ]
+    },
+    {
+        "id": "9f6b31fe256f878b",
+        "type": "debug",
+        "z": "d77ae86c60c0d054",
+        "name": "debug 12",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "3b661be732a9272d",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 7",
+        "func": "var eqData = [];\n\nfor(let i=0; i<msg.payload.length; i++)\n{\n    const dateObj = new Date(msg.payload[i].time);\n    const month = dateObj.getMonth() + 1;\n    const day = dateObj.getDate();\n    const hour = dateObj.getHours();\n    const minute = dateObj.getMinutes();\n\n    const formattedDate = `${day < 10 ? '0' : ''}${day}-${month < 10 ? '0' : ''}${month}`\n    const formattedTime = `${hour < 10 ? '0' : ''}${hour}:${minute < 10 ? '0' : ''}${minute}`\n\n    var eq = {\n        \"place\": msg.payload[i].place + \", \" + formattedDate + \", \" + formattedTime,\n        \"magnitudo\": msg.payload[i].mag\n    }\n\n    eqData.push(eq);\n}\n\nmsg.payload = eqData;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 160,
+        "wires": [
+            [
+                "84e6b05ad48155c8"
+            ]
+        ]
+    },
+    {
+        "id": "7a7db9e270fb9b6f",
+        "type": "ui_chart",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "group": "9aec0b4e451fd1a8",
+        "order": 1,
+        "width": 20,
+        "height": 11,
+        "label": "Magnitudo Bar Chart",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2",
+        "ymax": "10",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1180,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "84e6b05ad48155c8",
+        "type": "split",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 750,
+        "y": 160,
+        "wires": [
+            [
+                "9f6b31fe256f878b",
+                "9ced2278fb33627b"
+            ]
+        ]
+    },
+    {
+        "id": "9ced2278fb33627b",
+        "type": "change",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "payload.place",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.magnitudo",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 160,
+        "wires": [
+            [
+                "7a7db9e270fb9b6f"
+            ]
+        ]
+    },
+    {
+        "id": "eb40bfba50cff2fd",
+        "type": "ui_button",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "group": "9aec0b4e451fd1a8",
+        "order": 2,
+        "width": 10,
+        "height": 1,
+        "passthru": false,
+        "label": "Show Data",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 130,
+        "y": 160,
+        "wires": [
+            [
+                "7304a8ab1f8b611b"
+            ]
+        ]
+    },
+    {
+        "id": "4662c89de2b45d0f",
+        "type": "ui_button",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "group": "9aec0b4e451fd1a8",
+        "order": 3,
+        "width": 10,
+        "height": 1,
+        "passthru": false,
+        "label": "Clear Data",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 1110,
+        "y": 300,
+        "wires": [
+            [
+                "7a7db9e270fb9b6f"
+            ]
+        ]
+    },
+    {
+        "id": "f4d292a6c17f13d0",
+        "type": "debug",
+        "z": "d77ae86c60c0d054",
+        "name": "debug 13",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "3dcb1318c4da94e3",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 8",
+        "func": "var places = [];\n\nflow.set(\"dataTerremoti\", msg.payload);\n\nfor (let i = 0; i < msg.payload.length; i++) {\n\n    var eqPlace = msg.payload[i].place;\n\n    places.push(eqPlace);\n\n}\n\nflow.set(\"places\", places)\nmsg.payload = places; \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 260,
+        "wires": [
+            [
+                "3923b749116160a0"
+            ]
+        ]
+    },
+    {
+        "id": "ed91563ae69f75e7",
+        "type": "ui_dropdown",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "9aec0b4e451fd1a8",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 720,
+        "y": 260,
+        "wires": [
+            [
+                "1f35cd1457ed7078",
+                "302dfcfd0721e8bc",
+                "f68b68b2953dae5a"
+            ]
+        ]
+    },
+    {
+        "id": "3923b749116160a0",
+        "type": "change",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "options",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 560,
+        "y": 260,
+        "wires": [
+            [
+                "ed91563ae69f75e7"
+            ]
+        ]
+    },
+    {
+        "id": "1f35cd1457ed7078",
+        "type": "ui_text",
+        "z": "d77ae86c60c0d054",
+        "group": "9aec0b4e451fd1a8",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Place",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 930,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "afadfdb933a35f06",
+        "type": "ui_text",
+        "z": "d77ae86c60c0d054",
+        "group": "9aec0b4e451fd1a8",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Latitude",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1060,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "bfcf88ae030d9754",
+        "type": "ui_text",
+        "z": "d77ae86c60c0d054",
+        "group": "9aec0b4e451fd1a8",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Longitude",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1080,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "594418a1790f0143",
+        "type": "http request",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.csv",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 490,
+        "y": 560,
+        "wires": [
+            [
+                "7b5dd718df81af47"
+            ]
+        ]
+    },
+    {
+        "id": "7b5dd718df81af47",
+        "type": "csv",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 650,
+        "y": 560,
+        "wires": [
+            [
+                "963e4492d14bfa99"
+            ]
+        ]
+    },
+    {
+        "id": "5f7927374957dbb6",
+        "type": "inject",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 560,
+        "wires": [
+            [
+                "bb549c451add70c8"
+            ]
+        ]
+    },
+    {
+        "id": "3edb10dbeceaf74e",
+        "type": "debug",
+        "z": "d77ae86c60c0d054",
+        "name": "debug 15",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1120,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "963e4492d14bfa99",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 9",
+        "func": "\nvar eqData = flow.get(\"terremoto\") || []\n\neqData.push(msg.payload)\n\nflow.set(\"terremoto\", eqData);\n\nmsg.payload = flow.get(\"terremoto\")\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 560,
+        "wires": [
+            [
+                "71f7309535dd3d63"
+            ]
+        ]
+    },
+    {
+        "id": "314f20c27e4685b7",
+        "type": "ui_text",
+        "z": "d77ae86c60c0d054",
+        "group": "9aec0b4e451fd1a8",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Magnitudo",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1050.800048828125,
+        "y": 468.1999816894531,
+        "wires": []
+    },
+    {
+        "id": "bb549c451add70c8",
+        "type": "change",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "terremoto",
+                "pt": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 300,
+        "y": 560,
+        "wires": [
+            [
+                "594418a1790f0143"
+            ]
+        ]
+    },
+    {
+        "id": "71f7309535dd3d63",
+        "type": "delay",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 950,
+        "y": 560,
+        "wires": [
+            [
+                "3edb10dbeceaf74e"
+            ]
+        ]
+    },
+    {
+        "id": "b0d986258c52c6e8",
+        "type": "ui_worldmap",
+        "z": "d77ae86c60c0d054",
+        "group": "9aec0b4e451fd1a8",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "lat": "",
+        "lon": "",
+        "zoom": "2",
+        "layer": "EsriS",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "hide",
+        "layers": "hide",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "true",
+        "hiderightclick": "true",
+        "coords": "deg",
+        "showgrid": "true",
+        "showruler": "false",
+        "allowFileDrop": "false",
+        "path": "/worldmap",
+        "overlist": "DR,CO,RA,DN,HM",
+        "maplist": "OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 860,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "302dfcfd0721e8bc",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 10",
+        "func": "var eqData = flow.get(\"dataTerremoti\")\nvar places = flow.get(\"places\");\n\nvar index = places.indexOf(msg.payload)\n\nvar msg1 = { payload: eqData[index].latitude };\nvar msg2 = { payload: eqData[index].longitude };\nvar msg3 = { payload: eqData[index].mag };\n\nreturn [msg1,msg2,msg3];",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 380,
+        "wires": [
+            [
+                "afadfdb933a35f06"
+            ],
+            [
+                "bfcf88ae030d9754"
+            ],
+            [
+                "314f20c27e4685b7"
+            ]
+        ]
+    },
+    {
+        "id": "f68b68b2953dae5a",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 11",
+        "func": "var eqData = flow.get(\"dataTerremoti\")\nvar places = flow.get(\"places\");\n\nvar index = places.indexOf(msg.payload)\n\n\nmsg.payload = { \n   \"name\": \"terremoto\",\n   \"lat\": eqData[index].latitude,\n   \"lon\": eqData[index].longitude\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 460,
+        "wires": [
+            [
+                "b0d986258c52c6e8"
+            ]
+        ]
+    },
+    {
+        "id": "1c106dc10a2f1927",
+        "type": "http request",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.csv",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 390,
+        "y": 720,
+        "wires": [
+            [
+                "c7c405b99caf92e6"
+            ]
+        ]
+    },
+    {
+        "id": "c7c405b99caf92e6",
+        "type": "csv",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 550,
+        "y": 720,
+        "wires": [
+            [
+                "ebd8221e5448a270",
+                "3d5861771e5bd9dd"
+            ]
+        ]
+    },
+    {
+        "id": "33bade8f1de7fc26",
+        "type": "ui_date_picker",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "label": "date",
+        "group": "4b15bcab8dcf94d0",
+        "order": 2,
+        "width": 8,
+        "height": 1,
+        "passthru": true,
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 50,
+        "y": 760,
+        "wires": [
+            [
+                "69851d75e30c2719",
+                "ddee93571da0175f",
+                "a800e80d2d3890c6"
+            ]
+        ]
+    },
+    {
+        "id": "ebd8221e5448a270",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 12",
+        "func": "var eqData = [];\nvar luoghi = [];\nvar orari = [];\nvar giorni = [];\nvar magnitudo = [];\n\nfor(let i=0; i<msg.payload.length; i++)\n{\n    const dateObj = new Date(msg.payload[i].time);\n    const month = dateObj.getMonth() + 1;\n    const day = dateObj.getDate();\n    const hour = dateObj.getHours();\n    const minute = dateObj.getMinutes();\n\n    const formattedDate = `${day < 10 ? '0' : ''}${day}-${month < 10 ? '0' : ''}${month}`\n    const formattedTime = `${hour < 10 ? '0' : ''}${hour}:${minute < 10 ? '0' : ''}${minute}`\n\n    var dat1 = flow.get(\"date_last_month\");\n    var dat2 = msg.payload[i].time.slice(5, 10);\n    if (dat1 === dat2)\n    {\n        var msg1 = { payload: dat1 };\n        var msg2 = { payload: dat2 };\n        var eq = {\n            \"place\": msg.payload[i].place + \", \" + formattedDate + \", \" + formattedTime,\n            \"magnitudo\": msg.payload[i].mag\n        }\n\n        luoghi.push(msg.payload[i].place);\n        orari.push(formattedTime);\n        magnitudo.push(msg.payload[i].mag);\n        giorni.push(dat1);\n\n        eqData.push(eq);\n    }\n}\n\nflow.set(\"luoghi\", luoghi);\nflow.set(\"orari\", orari);\nflow.set(\"magnitudo\", magnitudo);\nflow.set(\"giorni\", giorni);\nmsg.payload = eqData;\n\nreturn [msg, msg1, msg2];",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 720,
+        "wires": [
+            [
+                "f9327fef2c4f528e",
+                "fd6654de96e490d6"
+            ],
+            [
+                "d507da766044c9d5"
+            ],
+            [
+                "91f1a680aacf1db7"
+            ]
+        ]
+    },
+    {
+        "id": "93f0bfe1a8629a27",
+        "type": "ui_chart",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "group": "4b15bcab8dcf94d0",
+        "order": 5,
+        "width": 22,
+        "height": 21,
+        "label": "Magnitudo Bar Chart",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2",
+        "ymax": "10",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1400,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f9327fef2c4f528e",
+        "type": "split",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 910,
+        "y": 720,
+        "wires": [
+            [
+                "d2ef62cb30e577e4"
+            ]
+        ]
+    },
+    {
+        "id": "d2ef62cb30e577e4",
+        "type": "change",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "payload.place",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.magnitudo",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1070,
+        "y": 720,
+        "wires": [
+            [
+                "93f0bfe1a8629a27"
+            ]
+        ]
+    },
+    {
+        "id": "69851d75e30c2719",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 13",
+        "func": "var dateObj = new Date(msg.payload);\n\nvar date = dateObj.toISOString().slice(5,10);\n\nflow.set(\"date_last_month\", date);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 720,
+        "wires": [
+            [
+                "1c106dc10a2f1927"
+            ]
+        ]
+    },
+    {
+        "id": "fd6654de96e490d6",
+        "type": "debug",
+        "z": "d77ae86c60c0d054",
+        "name": "debug 16",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 960,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "d507da766044c9d5",
+        "type": "debug",
+        "z": "d77ae86c60c0d054",
+        "name": "debug 17",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "91f1a680aacf1db7",
+        "type": "debug",
+        "z": "d77ae86c60c0d054",
+        "name": "debug 18",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "b289fd2a71241346",
+        "type": "ui_button",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "group": "4b15bcab8dcf94d0",
+        "order": 1,
+        "width": 8,
+        "height": 1,
+        "passthru": false,
+        "label": "Export",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 110,
+        "y": 940,
+        "wires": [
+            [
+                "781a16a1f902506b",
+                "1f4eb19335c10ff3",
+                "985863d074da1fa7"
+            ]
+        ]
+    },
+    {
+        "id": "781a16a1f902506b",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 14",
+        "func": "var luogo = flow.get(\"luoghi\");\nvar orario = flow.get(\"orari\");\nvar magn = flow.get(\"magnitudo\");\nvar giorno = flow.get(\"giorni\");\n\nvar data_ultimo_mese = [['Giorno', 'Ora', 'Mag', 'Luogo']]\n\nfor(let i=0; i < magn.length; i++)\n{\n    var row = [giorno[i], orario[i], magn[i], luogo[i]]; \n    data_ultimo_mese.push(row);\n}\n\nmsg.payload = '';\ndata_ultimo_mese.forEach(row => {\n    msg.payload += row.join('\\t') + '\\n';\n});\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 940,
+        "wires": [
+            [
+                "b0ddd6c53bbd407f",
+                "9dc2a9b4628e0de8"
+            ]
+        ]
+    },
+    {
+        "id": "a55b856a9aae5314",
+        "type": "change",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "luoghi",
+                "pt": "flow"
+            },
+            {
+                "t": "delete",
+                "p": "magnitudo",
+                "pt": "flow"
+            },
+            {
+                "t": "delete",
+                "p": "orari",
+                "pt": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1220,
+        "y": 780,
+        "wires": [
+            [
+                "93f0bfe1a8629a27"
+            ]
+        ]
+    },
+    {
+        "id": "946a879270ffa31e",
+        "type": "link out",
+        "z": "d77ae86c60c0d054",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "c5a0d1b0dd21f8cc"
+        ],
+        "x": 455,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "c5a0d1b0dd21f8cc",
+        "type": "link in",
+        "z": "d77ae86c60c0d054",
+        "name": "link in 1",
+        "links": [
+            "946a879270ffa31e"
+        ],
+        "x": 1095,
+        "y": 780,
+        "wires": [
+            [
+                "a55b856a9aae5314"
+            ]
+        ]
+    },
+    {
+        "id": "ddee93571da0175f",
+        "type": "change",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[]",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 300,
+        "y": 780,
+        "wires": [
+            [
+                "946a879270ffa31e"
+            ]
+        ]
+    },
+    {
+        "id": "b0ddd6c53bbd407f",
+        "type": "file",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "filename": "C:\\Earthquakes\\data.txt",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 610,
+        "y": 940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d3e82009581858ae",
+        "type": "file",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "filename": "C:\\Earthquakes\\terr.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 730,
+        "y": 1040,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9dc2a9b4628e0de8",
+        "type": "debug",
+        "z": "d77ae86c60c0d054",
+        "name": "debug 19",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "5faf1582e4689cb0",
+        "type": "ui_led",
+        "z": "d77ae86c60c0d054",
+        "order": 4,
+        "group": "4b15bcab8dcf94d0",
+        "width": 2,
+        "height": 1,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 390,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "a800e80d2d3890c6",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 16",
+        "func": "var oggi = new Date();\n\nvar data_select = new Date(msg.payload);\n\nvar unMeseFa = new Date(oggi);\nunMeseFa.setMonth(oggi.getMonth() - 1);\n\n// Se la data odierna è il 31 del mese e la data di un mese fa non ha 31 giorni, imposta la data al giorno precedente\nif (oggi.getDate() === 31 && oggi.getDate() !== unMeseFa.getDate()) {\n    unMeseFa.setDate(0);\n}\n\nif(data_select > oggi)\n    msg.payload = false;\n\nelse if(data_select < unMeseFa)\n    msg.payload = false;\n\nelse\n    msg.payload = true;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 170,
+        "y": 840,
+        "wires": [
+            [
+                "5faf1582e4689cb0",
+                "43bc5f2271c17848"
+            ]
+        ]
+    },
+    {
+        "id": "090f30b276ce89f1",
+        "type": "switch",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 690,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a8869f94d53fe1fa",
+        "type": "ui_text",
+        "z": "d77ae86c60c0d054",
+        "group": "4b15bcab8dcf94d0",
+        "order": 3,
+        "width": 4,
+        "height": 1,
+        "name": "",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 530,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "43bc5f2271c17848",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 17",
+        "func": "if (msg.payload == true)\n    msg.payload = \"ok\";\n\nelse\n    msg.payload = \"data non disponibile\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 880,
+        "wires": [
+            [
+                "a8869f94d53fe1fa"
+            ]
+        ]
+    },
+    {
+        "id": "3d5861771e5bd9dd",
+        "type": "debug",
+        "z": "d77ae86c60c0d054",
+        "name": "debug 20",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "1f4eb19335c10ff3",
+        "type": "function",
+        "z": "d77ae86c60c0d054",
+        "name": "function 18",
+        "func": "var luogo = flow.get(\"luoghi\");\nvar orario = flow.get(\"orari\");\nvar magn = flow.get(\"magnitudo\");\nvar giorno = flow.get(\"giorni\");\n\nvar data_ultimo_mese = []\ndata_ultimo_mese[0] = \"Giorno; Ora; Mag; Luogo\";\n\nfor(let i=0; i < magn.length; i++)\n{\n    data_ultimo_mese[i+1] = giorno[i]+ \";\" + orario[i] + \";\" + magn[i] + \";\" + luogo[i]; \n\n}\n\nmsg.payload = data_ultimo_mese;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 1040,
+        "wires": [
+            [
+                "af1b5f64d1b55177"
+            ]
+        ]
+    },
+    {
+        "id": "af1b5f64d1b55177",
+        "type": "split",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 510,
+        "y": 1040,
+        "wires": [
+            [
+                "d3e82009581858ae"
+            ]
+        ]
+    },
+    {
+        "id": "985863d074da1fa7",
+        "type": "file",
+        "z": "d77ae86c60c0d054",
+        "name": "",
+        "filename": "C:\\Earthquakes\\terr.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "delete",
+        "encoding": "none",
+        "x": 310,
+        "y": 1100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9aec0b4e451fd1a8",
+        "type": "ui_group",
+        "name": "Ultime 24h",
+        "tab": "568cad79c1350062",
+        "order": 1,
+        "disp": true,
+        "width": "20",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4b15bcab8dcf94d0",
+        "type": "ui_group",
+        "name": "Group 1",
+        "tab": "2e16dac06956eab2",
+        "order": 1,
+        "disp": true,
+        "width": 22,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "568cad79c1350062",
+        "type": "ui_tab",
+        "name": "Terremoti",
+        "icon": "dashboard",
+        "order": 5,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "2e16dac06956eab2",
+        "type": "ui_tab",
+        "name": "Last month",
+        "icon": "dashboard",
+        "order": 5,
+        "disabled": false,
+        "hidden": false
+    }
+]
